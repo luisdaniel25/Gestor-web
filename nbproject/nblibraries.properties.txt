@@ -1,0 +1,9 @@
+libs.CopyLibs.classpath=\
+    ${base}/../lib/itext-pdfa-5.5.13.4.jar;\
+    ${base}/../lib/itextpdf-5.5.13.4.jar;\
+    ${base}/../lib/mysql-connector-j-9.4.0.jar;\
+    ${base}/../lib/poi-5.4.1.jar;\
+    ${base}/../lib/poi-ooxml-5.4.1.jar;\
+    ${base}/../lib/poi-excelant-5.4.1.jar;\
+    ${base}/../lib/commons-collections4-4.4.jar;\
+    ${base}/../lib/xmlbeans-5.2.0.jar
