@@ -11,7 +11,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
-// ====== Apache POI ======
+
+// Apache POI
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -20,40 +21,41 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-@WebServlet(name = "ExcelExportServlet", urlPatterns = {"/ExcelExportServlet"})
+@WebServlet("/ExcelExportServlet")
 public class ExcelExportServlet extends HttpServlet {
 
+    private static final long serialVersionUID = 1L;
     private ProductoDAO dao = new ProductoDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         List<Producto> productos = dao.listar();
 
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=productos.xlsx");
+        response.setContentType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=\"productos.xlsx\"");
 
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Productos");
 
-            // ==== ESTILOS DE ENCABEZADO ====
+            // Estilos encabezado
             CellStyle headerStyle = workbook.createCellStyle();
-            Font hFont = workbook.createFont();
-            hFont.setBold(true);
-            headerStyle.setFont(hFont);
+            Font font = workbook.createFont();
+            font.setBold(true);
+            headerStyle.setFont(font);
             headerStyle.setAlignment(HorizontalAlignment.CENTER);
 
-            // ==== FILA DE ENCABEZADO ====
+            // Header row
             Row header = sheet.createRow(0);
-            String[] cols = {"ID", "Nombre", "Descripcion", "Precio", "Cantidad"};
+            String[] cols = {"ID", "Nombre", "Descripción", "Precio", "Cantidad"};
             for (int i = 0; i < cols.length; i++) {
                 Cell c = header.createCell(i);
                 c.setCellValue(cols[i]);
                 c.setCellStyle(headerStyle);
             }
 
-            // ==== FILAS CON PRODUCTOS ====
+            // Filas de datos
             int rowIdx = 1;
             for (Producto p : productos) {
                 Row r = sheet.createRow(rowIdx++);
@@ -64,14 +66,14 @@ public class ExcelExportServlet extends HttpServlet {
                 r.createCell(4).setCellValue(p.getCantidad());
             }
 
-            // ==== AUTO-AJUSTAR ANCHO DE COLUMNAS ====
+            // Auto size
             for (int i = 0; i < cols.length; i++) {
                 sheet.autoSizeColumn(i);
             }
 
-            // ==== ESCRIBIR AL OUTPUT STREAM ====
+            // Escribir al output
             workbook.write(response.getOutputStream());
-
+            response.getOutputStream().flush();
         } catch (Exception e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
@@ -80,13 +82,8 @@ public class ExcelExportServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        doGet(request, response); // Para que POST también exporte
-    }
-
-    @Override
-    public String getServletInfo() {
-        return "Exporta lista de productos a Excel con Apache POI";
+        doGet(req, resp);
     }
 }
